@@ -83,7 +83,11 @@ if (typeof jQuery === 'undefined') {
  * Copyright 2011-2016 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
-
+//$(document).ready(function () {
+//    $("#reporting").on("click", function () {
+//        alert('Report created successfully!');
+//    });
+//});
 
 +function ($) {
   'use strict';

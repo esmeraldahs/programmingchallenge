@@ -3,22 +3,40 @@
     padding-bottom: 20px;
 }
 
-/* Set padding to keep content from hitting the edges */
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 15px
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
 .dl-horizontal dt {
     white-space: normal;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
 input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.navbar.navbar-inverse.navbar-fixed-top {
+    background-color: #246982;
+    border: none;
+}
+
+h3, h4 {
+    font-family: Georgia, 'Times New Roman', Times, serif
+}
+
+button {
+    background-color: #011b23;
+    padding: 12px;
+    color: whitesmoke;
+    border: none;
+    border-radius: 10px;
+}
+
+#extract_message {
+    background-color: grey;
+    color: whitesmoke;
+    padding: 10px;
+    border-radius: 5px;
 }

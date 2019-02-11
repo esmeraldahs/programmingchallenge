@@ -1,0 +1,15 @@
+﻿@model ProgrammingChallenge.Models.JsonData
+@{
+    ViewBag.Title = "Extract Web Data";
+}
+
+<h3>Extracted json data: </h3>
+<div>
+    <pre>
+        @Model.ExtractedJsonData
+    </pre>
+    <p id="extract_message">
+        Find the file <b>"ExtractedData.json"</b> with the extracted data in json format, in the current directory of the project!
+    </p>
+</div>
+

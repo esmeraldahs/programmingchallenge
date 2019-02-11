@@ -1,0 +1,23 @@
+{
+  "HotelName": "Kempinski Hotel Bristol Berlin",
+  "Address": "Kurfürstendamm 27, Charlottenburg-Wilmersdorf, 10719 Berlin, Germany",
+  "Classification": 5,
+  "ReviewPoints": 8.3,
+  "NumberOfReviews": 1401,
+  "Description": "This 5-star hotel on Berlin’s Kurfürstendamm shopping street offers elegant rooms, an indoor pool and great public transport links. It is 600 metres from the Gedächtniskirche Church and Berlin Zoo.Kempinski Hotel Bristol Berlin offers air-conditioned rooms with large windows, modern bathrooms and international TV channels. Bathrobes are provided. Free WiFi is available in all areas and high-speed WiFi access can be booked at an additional cost.Gourmet cuisine is served in the popular Kempinski Grill. Reinhard's brasserie offer light cuisine and a terrace overlooking Kurfürstendamm. Guests can enjoy drinks in the Gobelin Halle lounge or in the Bristol Bar.Kempinski Bristol Berlin’s spa includes a sauna, steam room and gym. Massages and beauty treatments can also be booked here. The hotel's business centre can be used free of charge.Uhlandstraße Underground Station is just outside the Kempinski’s front door. The KaDeWe shopping mall is 2 stops away. We speak your language!This property has been on Booking.com since 17 May 2010.Hotel Rooms: 301, Hotel Chain:Kempinski",
+  "RoomCategories": [
+    "Suite with Balcony",
+    "Classic Double or Twin Room",
+    "Superior Double or Twin Room",
+    "Deluxe Double Room",
+    "Deluxe Business Suite",
+    "Junior Suite",
+    "Family Room"
+  ],
+  "AlternativeHotels": [
+    "Hotel Adlon Kempinski Berlin",
+    "Grand Hyatt Berlin",
+    "Sofitel Berlin Kurfürstendamm",
+    "Hilton Berlin"
+  ]
+}
