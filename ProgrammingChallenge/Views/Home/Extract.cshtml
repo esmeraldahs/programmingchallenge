@@ -8,8 +8,9 @@
     <pre>
         @Model.ExtractedJsonData
     </pre>
-    <p id="extract_message">
-        Find the file <b>"ExtractedData.json"</b> with the extracted data in json format, in the current directory of the project!
-    </p>
+    <button onclick="location.href='@Url.Action("DownloadExtractedData", "Home")'">
+        <span class="glyphicon glyphicon-download-alt"></span>
+        Download file
+    </button>
 </div>
 

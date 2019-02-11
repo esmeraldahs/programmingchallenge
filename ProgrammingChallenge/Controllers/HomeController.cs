@@ -38,9 +38,13 @@ namespace ProgrammingChallenge.Controllers
             {
                 doc.Load(reader);
 
+                //GET HOTEL NAME
                 extractedData.HotelName = doc.GetElementbyId("hp_hotel_name").InnerHtml.Replace("\n", "");
+
+                // GET ADDRESS
                 extractedData.Address = doc.GetElementbyId("hp_address_subtitle").InnerHtml.Replace("\n", "");
 
+                // GET CLASSIFICATION
                 var classification = doc.DocumentNode.Descendants("i").Where(d => d.GetAttributeValue("class", "").Contains("ratings_stars")).First();
                 foreach(var attribute in classification.Attributes)
                 {
@@ -50,14 +54,17 @@ namespace ProgrammingChallenge.Controllers
                     }
                 }
 
+                // GET REVIEW POINTS
                 var reviewPoints = doc.DocumentNode.Descendants("span").Where(d => d.GetAttributeValue("class", "").Contains("rating notranslate")).First();
                 var points = reviewPoints.InnerText.Replace("\n", "");
                 points = points.Split('/')[0];
                 extractedData.ReviewPoints = Convert.ToDouble(points);
 
+                // GET NUMBER OF REVIEWS
                 var reviewsNumber = doc.DocumentNode.Descendants("strong").Where(d => d.GetAttributeValue("class", "").Contains("count")).First();
                 extractedData.NumberOfReviews = Convert.ToInt32(reviewsNumber.InnerText.Replace("\n", ""));
 
+                // GET DESCRIPTION
                 var descriptionPart1 = doc.GetElementbyId("summary");
                 foreach (var summaryNode in descriptionPart1.ChildNodes)
                 {
@@ -72,6 +79,7 @@ namespace ProgrammingChallenge.Controllers
                         extractedData.Description += summaryNode.InnerText.Replace("\n", "");
                 }
 
+                // GET ROOM CATEGORIES
                 var hotelRooms = doc.GetElementbyId("maxotel_rooms").Descendants("td").Where(d => d.GetAttributeValue("class", "").Contains("ftd"));
                 var roomCategories = new List<string>();
                 foreach (var childNode in hotelRooms)
@@ -80,16 +88,19 @@ namespace ProgrammingChallenge.Controllers
                 }
                 extractedData.RoomCategories = roomCategories.ToArray();
 
-                var otherHotels = doc.GetElementbyId("altHotelsRow").Descendants("a").Where(d => d.GetAttributeValue("class", "").Contains("althotel_link"));
+                // GET ALTERNATIVE HOTELS
+                var altHotels = doc.GetElementbyId("altHotelsRow").Descendants("a").Where(d => d.GetAttributeValue("class", "").Contains("althotel_link"));
                 var alternativeHotels = new List<string>();
-                foreach (var hotel in otherHotels)
+                foreach (var hotel in altHotels)
                 {
                     alternativeHotels.Add(hotel.InnerText.Replace("\n", ""));
                 }
                 extractedData.AlternativeHotels = alternativeHotels.ToArray();
 
+                DeleteFileIfExists(jsonFilePath);
                 var jsonData = JsonConvert.SerializeObject(extractedData, Formatting.Indented);
                 System.IO.File.WriteAllText(jsonFilePath, jsonData);
+
                 model.ExtractedJsonData = jsonData;
             }
             return View(model);
@@ -100,11 +111,11 @@ namespace ProgrammingChallenge.Controllers
             int startIndex = value.LastIndexOf("_stars_") + 7;
             value = value.Substring(startIndex, 2);
             if (value.Contains(' '))
-                value.Replace(" ", String.Empty);
+                value.Replace(" ", string.Empty);
             return Convert.ToInt32(value);
         }
 
-        public ActionResult Reporting()
+        public FileResult Reporting()
         {
             var jsonFilePath = Server.MapPath(hotelRatesFile);
             var hotelRates = new HotelRates();
@@ -113,11 +124,22 @@ namespace ProgrammingChallenge.Controllers
                 string json = reader.ReadToEnd();
                 hotelRates = JsonConvert.DeserializeObject<HotelRates>(json);
             }
-            GenerateReport(hotelRates);
-            return RedirectToAction("Index");
+
+            var reportFilePath = GenerateReport(hotelRates);
+            byte[] fileBytes = System.IO.File.ReadAllBytes(reportFilePath);
+            string fileName = "HotelRatesReport.xlsx";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
-        public void GenerateReport(HotelRates hotelRates)
+        public void DeleteFileIfExists(string filePath)
+        {
+            if(System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        public string GenerateReport(HotelRates hotelRates)
         {
             var excelData = new List<ExcelData>();
             var reportFilePath = Server.MapPath(reportFile);
@@ -153,15 +175,26 @@ namespace ProgrammingChallenge.Controllers
                     item.RateName, item.Adults, item.BreakfastIncluded);
             }
 
+            DeleteFileIfExists(reportFilePath);
             var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add(dt, "Hotel_Rates");
             wb.SaveAs(reportFilePath);
+
+            return reportFilePath;
         }
 
         public string FormatDateTime(string datetime)
         {
             DateTimeOffset result = DateTimeOffset.Parse(datetime, CultureInfo.InvariantCulture);
             return result.ToString("dd.MM.yy");
+        }
+
+        public FileResult DownloadExtractedData()
+        {
+            string jsonFilePath = Server.MapPath(extractedDataFile);
+            byte[] fileBytes = System.IO.File.ReadAllBytes(jsonFilePath);
+            string fileName = "ExtractedData.json";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
     }
 }
