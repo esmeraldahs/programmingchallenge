@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using log4net;
 using Newtonsoft.Json;
 using ProgrammingChallenge.PropertiesClasses;
 using System;
@@ -15,6 +16,7 @@ namespace ProgrammingChallenge.Controllers
     {
         public readonly string hotelRatesFile = "hotelrates.json";
         public readonly string reportFile = "HotelRatesReport.xlsx";
+        static ILog logger = LogManager.GetLogger(typeof(HomeController));
 
         public ActionResult Index()
         {
@@ -33,7 +35,10 @@ namespace ProgrammingChallenge.Controllers
 
             var reportFilePath = GenerateReport(hotelRates);
             if (reportFilePath == null)
+            {
+                logger.Error($"Value for file {reportFilePath} was null.");
                 RedirectToAction("Error");
+            }
             byte[] fileBytes = System.IO.File.ReadAllBytes(reportFilePath);
             string fileName = "HotelRatesReport.xlsx";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
@@ -44,14 +49,22 @@ namespace ProgrammingChallenge.Controllers
             if(System.IO.File.Exists(filePath))
             {
                 System.IO.File.Delete(filePath);
+                logger.Info($"File {filePath} was deleted successfully!");
             }
         }
 
         public string GenerateReport(HotelRates hotelRates)
         {
             var reportFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, reportFile);
+            if (reportFilePath != null)
+                DeleteFileIfExists(reportFilePath);
+            else
+            {
+                logger.Error($"Did not find the required file {reportFilePath}");
+                return null;
+            }
+
             var excelData = new List<ExcelData>();
-         
             foreach (var hotelRate in hotelRates.hotelRates)
             {
                 var departureDay = Convert.ToDateTime(hotelRate.targetDay).AddDays(hotelRate.los).ToString();
@@ -82,11 +95,12 @@ namespace ProgrammingChallenge.Controllers
                 dt.Rows.Add(item.ArrivalDate, item.DepartureDate, item.Price, item.Currency,
                     item.RateName, item.Adults, item.BreakfastIncluded);
             }
-
-            DeleteFileIfExists(reportFilePath);
+            
             var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add(dt, "Hotel_Rates");
             wb.SaveAs(reportFilePath);
+
+            logger.Info($"Report file was generated successfully. Path = {reportFilePath}");
 
             return reportFilePath;
         }

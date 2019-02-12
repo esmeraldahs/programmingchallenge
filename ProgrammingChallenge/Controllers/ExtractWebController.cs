@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using log4net;
 using Newtonsoft.Json;
 using ProgrammingChallenge.Models;
 using ProgrammingChallenge.PropertiesClasses;
@@ -14,7 +15,8 @@ namespace ProgrammingChallenge.Controllers
     {
         public readonly string extractedDataFile = "ExtractedData.json";
         public readonly string htmlFile = "bookingpage.html";
-        
+        ILog logger = LogManager.GetLogger(typeof(ExtractWebController));
+
         public ActionResult Index()
         {
             try
@@ -27,8 +29,9 @@ namespace ProgrammingChallenge.Controllers
                 };
                 return View(model);
             }
-            catch
+            catch(Exception ex)
             {
+                logger.Error($"Caught exception: {ex.Message}. Stack trace: {ex.StackTrace}");
                 return RedirectToAction("Error", "Home");
             }
         }
@@ -145,6 +148,7 @@ namespace ProgrammingChallenge.Controllers
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Delete(filePath);
+                logger.Info($"File {filePath} was deleted successfully!");
             }
         }
 
