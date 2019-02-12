@@ -149,6 +149,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\IPathProvider.cs" />
+    <Compile Include="Helpers\ServerPathProvider.cs" />
     <Compile Include="Models\JsonData.cs" />
     <Compile Include="PropertiesClasses\ExcelData.cs" />
     <Compile Include="PropertiesClasses\ExtractedData.cs" />
