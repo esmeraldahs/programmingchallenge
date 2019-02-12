@@ -12,17 +12,33 @@ namespace ProgrammingChallenge.Controllers
 {
     public class ExtractWebController : Controller
     {
-        public readonly string extractedDataFile = @"~/ExtractedData.json";
-        public readonly string htmlFile = @"~/bookingpage.html";
-
+        public readonly string extractedDataFile = "ExtractedData.json";
+        public readonly string htmlFile = "bookingpage.html";
+        
         public ActionResult Index()
         {
-            string htmlFilePath = Server.MapPath(htmlFile);
-            string jsonFilePath = Server.MapPath(extractedDataFile);
+            try
+            {
+                string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, htmlFile);
+                var jsonData = ExtractData(htmlFilePath);
+                var model = new JsonData
+                {
+                    ExtractedJsonData = jsonData
+                };
+                return View(model);
+            }
+            catch
+            {
+                return RedirectToAction("Error", "Home");
+            }
+        }
 
+        public string ExtractData(string htmlFilePath)
+        {
+            var jsonData = "";
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, extractedDataFile);
             var doc = new HtmlDocument();
             var extractedData = new ExtractedData();
-            var model = new JsonData();
 
             try
             {
@@ -96,16 +112,14 @@ namespace ProgrammingChallenge.Controllers
                     extractedData.AlternativeHotels = alternativeHotels.ToArray();
 
                     DeleteFileIfExists(jsonFilePath);
-                    var jsonData = JsonConvert.SerializeObject(extractedData, Formatting.Indented);
+                    jsonData = JsonConvert.SerializeObject(extractedData, Formatting.Indented);
                     System.IO.File.WriteAllText(jsonFilePath, jsonData);
-
-                    model.ExtractedJsonData = jsonData;
                 }
-                return View(model);
+                return jsonData;
             }
             catch
             {
-                return RedirectToAction("Error", "Home");
+                throw new Exception();
             }
         }
 
@@ -118,8 +132,9 @@ namespace ProgrammingChallenge.Controllers
 
         public int GetValue(string value)
         {
-            int startIndex = value.LastIndexOf("_stars_") + 7;
-            value = value.Substring(startIndex, 2);
+            var lastindex = value.LastIndexOf("_stars_");
+            int startIndex = lastindex + 7;
+            value = value.Substring(startIndex, 1);
             if (value.Contains(' '))
                 value.Replace(" ", string.Empty);
             return Convert.ToInt32(value);
@@ -135,7 +150,7 @@ namespace ProgrammingChallenge.Controllers
 
         public FileResult DownloadExtractedData()
         {
-            string jsonFilePath = Server.MapPath(extractedDataFile);
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, extractedDataFile);
             byte[] fileBytes = System.IO.File.ReadAllBytes(jsonFilePath);
             string fileName = "ExtractedData.json";
             return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);

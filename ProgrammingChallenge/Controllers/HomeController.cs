@@ -1,6 +1,5 @@
 ﻿using ClosedXML.Excel;
 using Newtonsoft.Json;
-using ProgrammingChallenge.Helpers;
 using ProgrammingChallenge.PropertiesClasses;
 using System;
 using System.Collections.Generic;
@@ -8,17 +7,15 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace ProgrammingChallenge.Controllers
 {
     public class HomeController : Controller
     {
-        public readonly string hotelRatesFile = @"~/hotelrates.json";
-        public readonly string reportFile = @"~/HotelRatesReport.xlsx";
-        public ServerPathProvider pathProvider = new ServerPathProvider();
-        
+        public readonly string hotelRatesFile = "hotelrates.json";
+        public readonly string reportFile = "HotelRatesReport.xlsx";
+
         public ActionResult Index()
         {
             return View("Index");
@@ -26,7 +23,7 @@ namespace ProgrammingChallenge.Controllers
 
         public FileResult Reporting()
         {
-            var jsonFilePath = Server.MapPath(hotelRatesFile);
+            var jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, hotelRatesFile);
             var hotelRates = new HotelRates();
             using (StreamReader reader = new StreamReader(jsonFilePath))
             {
@@ -52,7 +49,7 @@ namespace ProgrammingChallenge.Controllers
 
         public string GenerateReport(HotelRates hotelRates)
         {
-            var reportFilePath = pathProvider.MapPath(reportFile);
+            var reportFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, reportFile);
             var excelData = new List<ExcelData>();
          
             foreach (var hotelRate in hotelRates.hotelRates)
@@ -96,7 +93,7 @@ namespace ProgrammingChallenge.Controllers
 
         public string FormatDateTime(string datetime)
         {
-            DateTimeOffset result = DateTimeOffset.Parse(datetime, CultureInfo.InvariantCulture);
+            var result = DateTimeOffset.Parse(datetime, CultureInfo.InvariantCulture);
             return result.ToString("dd.MM.yy");
         }
 

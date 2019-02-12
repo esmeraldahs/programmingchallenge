@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProgrammingChallenge.Controllers;
-using ProgrammingChallenge.Helpers;
 using ProgrammingChallenge.PropertiesClasses;
 using System;
 using System.Collections.Generic;
@@ -13,24 +12,24 @@ namespace ProgrammingChallengeTests.Controllers
     public class HomeControllerTests
     {
         public HomeController homeController;
-        public TestPathProvider pathProvider;
 
         [TestInitialize]
         public void Initialize()
         {
-            pathProvider = new TestPathProvider();
             homeController = new HomeController();
         }
 
         [TestMethod]
         public void IndexView()
         {
-            var view = homeController.Index() as ViewResult;
-            Assert.AreEqual("Index", view.ViewName);
+            var view = homeController.Index();
+            Assert.IsInstanceOfType(view, typeof(ViewResult));
+            var returnedView = view as ViewResult;
+            Assert.AreEqual("Index", returnedView.ViewName);
         }
 
         [TestMethod]
-        public void CheckIfFileIsDeleted()
+        public void FileIsDeletedSuccessfully()
         {
             var fileToDelete = @"testFile.txt";
             var directory = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
@@ -42,7 +41,7 @@ namespace ProgrammingChallengeTests.Controllers
         }
 
         [TestMethod]
-        public void CheckIfReportIsGenerated()
+        public void ReportIsGeneratedSuccessfully()
         {
             var rateTag = new List<RateTags>();
             rateTag.Add(new RateTags
@@ -82,6 +81,16 @@ namespace ProgrammingChallengeTests.Controllers
 
             var filepath = homeController.GenerateReport(hotelRates);
             Assert.IsTrue(File.Exists(filepath));
+        }
+
+        [TestMethod]
+        public void DateTimeIsFormattedCorrectly()
+        {
+            var dateTime = "12/8/2015 3:15:19 PM";
+            var expected = "08.12.15";
+            var actual = homeController.FormatDateTime(dateTime);
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }
