@@ -23,25 +23,40 @@ namespace ProgrammingChallenge.Controllers
             return View("Index");
         }
 
-        public FileResult Reporting()
+        public ActionResult Reporting()
         {
-            var jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, hotelRatesFile);
-            var hotelRates = new HotelRates();
-            using (StreamReader reader = new StreamReader(jsonFilePath))
+            try
             {
-                string json = reader.ReadToEnd();
-                hotelRates = JsonConvert.DeserializeObject<HotelRates>(json);
-            }
+                // GET THE "hotelrates.json" FILE
+                var jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, hotelRatesFile);
+                var hotelRates = new HotelRates();
+                using (StreamReader reader = new StreamReader(jsonFilePath))
+                {
+                    string json = reader.ReadToEnd();
+                    hotelRates = JsonConvert.DeserializeObject<HotelRates>(json);
+                }
+                
+                // GENERATE THE REPORT FROM THE DATA
+                var reportFilePath = GenerateReport(hotelRates);
+                if (reportFilePath == null)
+                {
+                    logger.Error($"Value for file {reportFilePath} was null.");
+                    return RedirectToAction("Error");
+                }
 
-            var reportFilePath = GenerateReport(hotelRates);
-            if (reportFilePath == null)
-            {
-                logger.Error($"Value for file {reportFilePath} was null.");
-                RedirectToAction("Error");
+                // DOWLOAD THE FILE AT USER'S LOCAL MACHINE
+                return DownloadExtractedData(reportFilePath);
             }
-            byte[] fileBytes = System.IO.File.ReadAllBytes(reportFilePath);
-            string fileName = "HotelRatesReport.xlsx";
-            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            catch (FileNotFoundException ex)
+            {
+                logger.Error($"FileNotFoundException. Error: {ex.Message}. Stack trace: {ex.StackTrace}");
+                return RedirectToAction("Error");
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Caught exception. Error: {ex.Message}. Stack trace: {ex.StackTrace}");
+                return RedirectToAction("Error");
+            }
         }
 
         public void DeleteFileIfExists(string filePath)
@@ -56,13 +71,7 @@ namespace ProgrammingChallenge.Controllers
         public string GenerateReport(HotelRates hotelRates)
         {
             var reportFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, reportFile);
-            if (reportFilePath != null)
-                DeleteFileIfExists(reportFilePath);
-            else
-            {
-                logger.Error($"Did not find the required file {reportFilePath}");
-                return null;
-            }
+            DeleteFileIfExists(reportFilePath);
 
             var excelData = new List<ExcelData>();
             foreach (var hotelRate in hotelRates.hotelRates)
@@ -98,10 +107,9 @@ namespace ProgrammingChallenge.Controllers
             
             var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add(dt, "Hotel_Rates");
-            wb.SaveAs(reportFilePath);
+            wb.SaveAs(reportFilePath); // SAVE THE FILE LOCALLY
 
             logger.Info($"Report file was generated successfully. Path = {reportFilePath}");
-
             return reportFilePath;
         }
 
@@ -109,6 +117,14 @@ namespace ProgrammingChallenge.Controllers
         {
             var result = DateTimeOffset.Parse(datetime, CultureInfo.InvariantCulture);
             return result.ToString("dd.MM.yy");
+        }
+
+        public FileResult DownloadExtractedData(string reportFilePath)
+        {
+            // GET THE FILE PREVIOUSLY GENERATED AND SAVED LOCALLY
+            byte[] fileBytes = System.IO.File.ReadAllBytes(reportFilePath);
+            string fileName = "HotelRatesReport.xlsx";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
         }
 
         public ActionResult Error()

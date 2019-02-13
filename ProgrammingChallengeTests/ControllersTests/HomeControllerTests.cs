@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.Mvc;
 
-namespace ProgrammingChallengeTests.Controllers
+namespace ProgrammingChallengeTests.ControllersTests
 {
     [TestClass]
     public class HomeControllerTests

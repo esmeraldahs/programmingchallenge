@@ -21,6 +21,7 @@ Reason why there are 2 tasks solutions in one project : to not make the solution
 	* Get's json file  *(hotelrates.json)*
 	* Deserializes the data & gets what we need
 	* Returns and downloads locally the excel report file
+3. For both of tasks to work properly, the html file called *"bookingpage.html"* and json file called *"hotelrates.json"* should be included in project's folder (currently they are included)
 
 1. Frameworks and technologies used: 
 	* .NET Framework version 4.7.1

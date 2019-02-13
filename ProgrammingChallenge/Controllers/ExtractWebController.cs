@@ -15,14 +15,18 @@ namespace ProgrammingChallenge.Controllers
     {
         public readonly string extractedDataFile = "ExtractedData.json";
         public readonly string htmlFile = "bookingpage.html";
-        ILog logger = LogManager.GetLogger(typeof(ExtractWebController));
+        static ILog logger = LogManager.GetLogger(typeof(ExtractWebController));
 
         public ActionResult Index()
         {
             try
             {
+                // LOAD THE HTML FILE
                 string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, htmlFile);
+                // EXTRACT THE NEEDED INFO FROM THE FILE
                 var jsonData = ExtractData(htmlFilePath);
+                if(jsonData == null)
+                    return RedirectToAction("Error", "Home");
                 var model = new JsonData
                 {
                     ExtractedJsonData = jsonData
@@ -116,13 +120,14 @@ namespace ProgrammingChallenge.Controllers
 
                     DeleteFileIfExists(jsonFilePath);
                     jsonData = JsonConvert.SerializeObject(extractedData, Formatting.Indented);
-                    System.IO.File.WriteAllText(jsonFilePath, jsonData);
+                    System.IO.File.WriteAllText(jsonFilePath, jsonData); // SAVE THE FILE LOCALLY
                 }
                 return jsonData;
             }
-            catch
+            catch(Exception ex)
             {
-                throw new Exception();
+                logger.Error($"Caught exception. Error: {ex.Message}. Stack trace: {ex.StackTrace}");
+                return null;
             }
         }
 
@@ -154,6 +159,7 @@ namespace ProgrammingChallenge.Controllers
 
         public FileResult DownloadExtractedData()
         {
+            // GET THE FILE PREVIOUSLY GENERATED AND SAVED LOCALLY
             string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, extractedDataFile);
             byte[] fileBytes = System.IO.File.ReadAllBytes(jsonFilePath);
             string fileName = "ExtractedData.json";

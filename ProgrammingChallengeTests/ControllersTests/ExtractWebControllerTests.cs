@@ -4,7 +4,7 @@ using ProgrammingChallenge.Models;
 using System;
 using System.Web.Mvc;
 
-namespace ProgrammingChallengeTests.Controllers
+namespace ProgrammingChallengeTests.ControllersTests
 {
     [TestClass]
     public class ExtractWebControllerTests
@@ -18,11 +18,11 @@ namespace ProgrammingChallengeTests.Controllers
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void ExtractDataWithNullFileNameShouldThrowException()
+        public void ExtractDataWithNullFileNameShouldReturnNull()
         {
             string fileName = null;
             var response = extractWebController.ExtractData(fileName);
+            Assert.IsNull(response);
         }
 
         [TestMethod]
