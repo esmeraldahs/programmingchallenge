@@ -1,6 +1,7 @@
 # Programming Challenge
 
 ###### Hello PrestaCap, and welcome in this programming challenge
+###### My name is Esmeralda Hysenaj and below you can find notes and documentation regarding the tasks.
 
 In the solution named **ProgrammingChallenge**, you will find the solution for 2 out of 3 tasks.
 if you're wondering why 2, then the reason is i want to stand out :)
